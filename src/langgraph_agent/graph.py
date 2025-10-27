@@ -7,8 +7,6 @@ from .llms import (
     summary_generation_chain
 )
 
-# --- Agent Nodes ---
-
 def node_analyze_image(state: WorkflowState) -> WorkflowState:
     """Analyzes the user's image and updates the state."""
     print("--- Node: Analyzing Image ---")
@@ -19,12 +17,11 @@ def node_analyze_image(state: WorkflowState) -> WorkflowState:
         ))
         return state
 
-    # Call the tool
     prediction_result = tool_analyze_skin_image.invoke({"image": image})
     
     if "Error:" in prediction_result:
         state['chat_history'].append(AIMessage(content=prediction_result))
-        state['final_diagnosis'] = "Error" # Mark as ended
+        state['final_diagnosis'] = "Error" 
         return state
     
     state['disease_prediction'] = prediction_result
@@ -39,7 +36,7 @@ def node_fetch_symptoms(state: WorkflowState) -> WorkflowState:
     
     if "error" in info:
         state['chat_history'].append(AIMessage(content=info['error']))
-        state['final_diagnosis'] = "Error" # Mark as ended
+        state['final_diagnosis'] = "Error" 
         return state
     
     state['symptoms_to_check'] = info.get("symptoms", [])
@@ -60,7 +57,6 @@ def node_ask_symptom_question(state: WorkflowState) -> WorkflowState:
     
     symptom = symptoms[index]
     
-    # Use the LLM chain to generate a friendly question
     question = question_generation_chain.invoke({"symptom": symptom})
     
     state['chat_history'].append(AIMessage(content=question))
@@ -72,12 +68,10 @@ def node_process_user_response(state: WorkflowState) -> WorkflowState:
     print("--- Node: Processing User Response ---")
     last_human_message = state['chat_history'][-1].content
     
-    # Get the symptom we *just* asked about
     index = state['current_symptom_index']
     last_asked_symptom = state['symptoms_to_check'][index - 1]
     
     try:
-        # Use LLM to classify the response
         classification = symptom_classifier_chain.invoke(
             {"last_human_message": last_human_message}
         )
@@ -97,7 +91,6 @@ def node_generate_final_response(state: WorkflowState) -> WorkflowState:
     """Generates the final summary and disclaimer for the user."""
     print("--- Node: Generating Final Response ---")
     
-    # The CRITICAL disclaimer
     disclaimer = (
         "\n\n**DISCLAIMER:**\n"
         "I am just a dumb agent, not a medical professional. "
@@ -114,10 +107,9 @@ def node_generate_final_response(state: WorkflowState) -> WorkflowState:
     })
     
     state['chat_history'].append(AIMessage(content=summary))
-    state['final_diagnosis'] = "Complete" # Mark as ended
+    state['final_diagnosis'] = "Complete" 
     return state
 
-# --- Conditional Logic (Routers) ---
 
 def router_should_ask_symptoms(state: WorkflowState) -> str:
     """
@@ -146,6 +138,6 @@ def router_check_image_analysis(state: WorkflowState) -> str:
     Checks if the image analysis was successful.
     """
     if state.get("final_diagnosis") == "Error":
-        return "end_error" # Go to a final end node
+        return "end_error" 
     else:
         return "fetch_symptoms"
