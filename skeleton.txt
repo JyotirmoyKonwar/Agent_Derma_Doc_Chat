@@ -1,0 +1,26 @@
+Agentic Project
+|
+|->src
+|   |
+|   |main.py
+|   |
+|   |->langgraph_agent
+|           |
+|           |->LLMs->hfllms.py
+|           |
+|           |->graph->graph_builder.py
+|           |
+|           |->nodes->image analyzer, self thought loop, etc
+|           |
+|           |->state->state.py
+|           |
+|           |->tools->tools.py
+|           |
+|           |->ui->uiconfigfile.ini,uiconfigfile.py
+|               |
+|               |->streamlit->display_results.py, loadui.py
+|main.py
+
+-------------------------
+
+Now my aim is to make an agentic ai chatbot that will first take in an image of the skin disease, then the model will return it's 
