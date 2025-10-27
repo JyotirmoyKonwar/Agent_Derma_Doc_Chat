@@ -1,0 +1,9 @@
+langchain-pinecone
+langchain
+langchain-community
+ipykernel
+langchain-core
+langchain-text-splitters
+langgraph
+sentence-transformers
+python-dotenv
