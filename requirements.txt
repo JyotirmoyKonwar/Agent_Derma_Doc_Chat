@@ -1,3 +1,4 @@
+pydantic
 langchain-pinecone
 langchain
 langchain-community
@@ -7,3 +8,9 @@ langchain-text-splitters
 langgraph
 sentence-transformers
 python-dotenv
+gradio
+langchain-huggingface
+pinecone-client
+requests
+pillow
+pypdf
