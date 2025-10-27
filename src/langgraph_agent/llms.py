@@ -2,7 +2,7 @@ import os
 from langchain_huggingface import HuggingFaceEndpoint
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import StrOutputParser, JsonOutputParser
-from langchain_core.runnables import Runnable
+from langchain_core.runnables import RunnableLambda
 
 LLM_REPO_ID = os.environ.get("LLM_REPO_ID", "Jyo-K/Fine-Tuned-Qwen2.5_1B")
 HF_API_KEY = os.environ.get("HF_API_KEY")
@@ -14,8 +14,9 @@ def get_llm():
     global _llm_instance
     if _llm_instance is None:
         if not HF_API_KEY:
-            raise ValueError("HF_API_KEY environment variable not set. Cannot initialize LLM.")
+            raise ValueError("HF_TOKEN environment variable not set. Cannot initialize LLM.")
         _llm_instance = HuggingFaceEndpoint(
+            #model= "Jyo-K/Fine-Tuned-Qwen2.5_1B",
             repo_id=LLM_REPO_ID,
             huggingfacehub_api_token=HF_API_KEY,
             temperature=0.1,
@@ -36,7 +37,9 @@ classifier_prompt = ChatPromptTemplate.from_messages([
         "{{\"classification\": \"yes\"}} or {{\"classification\": \"no\"}} or {{\"classification\": \"unclear\"}}"
     ))
 ])
-symptom_classifier_chain = classifier_prompt | Runnable(get_llm) | JsonOutputParser()
+
+
+symptom_classifier_chain = classifier_prompt | get_llm() | JsonOutputParser()
 
 question_prompt = ChatPromptTemplate.from_messages([
     ("system", (
@@ -46,7 +49,8 @@ question_prompt = ChatPromptTemplate.from_messages([
         "\nExample: Are you experiencing any itchiness or a rash?"
     ))
 ])
-question_generation_chain = question_prompt | Runnable(get_llm) | StrOutputParser()
+
+question_generation_chain = question_prompt | get_llm() | StrOutputParser()
 
 
 summary_prompt = ChatPromptTemplate.from_messages([
@@ -68,5 +72,5 @@ summary_prompt = ChatPromptTemplate.from_messages([
         "Generate your summary now."
     ))
 ])
-summary_generation_chain = summary_prompt | Runnable(get_llm) | StrOutputParser()
 
+summary_generation_chain = summary_prompt | get_llm() | StrOutputParser()

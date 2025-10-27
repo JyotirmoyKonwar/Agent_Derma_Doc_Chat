@@ -21,7 +21,7 @@ SWIN_LABELS = [
     '6. Malign'
 ]
 
-# --- Lazy Initialized Global Clients ---
+
 _pinecone_client = None
 _pinecone_index = None
 
